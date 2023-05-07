@@ -57,17 +57,19 @@ int main() {
         buffer[n] = '\0';
 
         // Tìm số lần xuất hiện của xâu "0123456789" trong dữ liệu nhận được
-        char *ptr = buffer;
-        while ((ptr = strstr(ptr, "0123456789")) != NULL) {
-            count++;
+        char i='0';
+        int k=0;
+        while (buffer[k]!= '\0') {
             // Xử lý trường hợp khi xâu "0123456789" nằm giữa 2 lần truyền
-            if (prev_occurence > 0 && ptr - buffer >= prev_occurence) {
-                count--;
+            if (buffer[k]==i&&i<'9') {
+                i++;
             }
-            prev_occurence = ptr - buffer + 10;
-            ptr += 10;
+            else if(buffer[k]==i&&i=='9'){
+                count++;
+                i='0';
+            }
+            k++;
         }
-
         // Hiển thị số lần xuất hiện
         printf("Number of occurrences of \"0123456789\": %d\n", count);
 
