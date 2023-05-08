@@ -8,6 +8,11 @@
 #include <string.h>
 #include <sys/select.h>
 
+typedef struct
+{
+    char name[64];
+} ClientName;
+
 int main() 
 {
     int listener = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -37,9 +42,13 @@ int main()
     fd_set fdread;
     
     int clients[64];
+    ClientName clientName[64];
     int num_clients = 0;
     
     char buf[256];
+
+    char quesName[] = "Xin hãy nhập tên client !";
+    char form[]= "client_id";
     
     while (1)
     {
@@ -73,6 +82,7 @@ int main()
             int client = accept(listener, NULL, NULL);
             printf("Ket noi moi: %d\n", client);
             clients[num_clients++] = client;
+            send(client, quesName, strlen(quesName), 0);
         }
 
         // Kiểm tra sự kiện có dữ liệu truyền đến socket client
@@ -85,8 +95,29 @@ int main()
                     // TODO: Client đã ngắt kết nối, xóa client ra khỏi mảng
                     continue;
                 }
+                if(!clientName[i]){
+                    char *p;
+                    strcpy(p, buf);
+                    p = strtok(p, ",");
+                    if(strcmp(p, form))
+                    {
+                      p = strtok(NULL, ":");
+                      strcpy(clientName[i], p);
+                    }
+                    else{
+                      send(clients[i], quesName, strlen(quesName), 0);
+                    }
+                }
+                else{
+                    for (int j = 0; j < num_clients; j++){
+                        if(j!=i&&FD_ISSET(clients[j], &fdread)){
+                           send(clients[i], quesName, strlen(quesName), 0);
+                        }
+                    }
+                }
                 buf[ret] = 0;
                 printf("Du lieu nhan tu %d: %s\n", clients[i], buf);
+                
             }
     }
 
