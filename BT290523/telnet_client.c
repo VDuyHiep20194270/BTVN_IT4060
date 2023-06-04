@@ -34,6 +34,7 @@ int main() {
         while (1)
         {
             fgets(buf, sizeof(buf), stdin);
+            buf[strcspn(buf, "\n")] = '\0';
             send(client, buf, strlen(buf), 0);
             if (strncmp(buf, "exit", 4) == 0)
                 break;
@@ -47,7 +48,7 @@ int main() {
             int ret = recv(client, buf, sizeof(buf), 0);
             if (ret <= 0)
                 break;
-            buf[ret] = 0;
+            buf[ret] = '\0';
             printf("Received: %s\n", buf);
         }
     }
